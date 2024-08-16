@@ -8,7 +8,6 @@ const userTable = `CREATE TABLE IF NOT EXISTS user(
     PRIMARY KEY(userid)
 );`;
 
-
 const questionTable = `CREATE TABLE IF NOT EXISTS questions(
     id INT(20) NOT NULL AUTO_INCREMENT,
     questionid VARCHAR(100) NOT NULL UNIQUE,
@@ -21,25 +20,25 @@ const questionTable = `CREATE TABLE IF NOT EXISTS questions(
 )`;
 
 const answerTable = `CREATE TABLE IF NOT EXISTS answers(
-    answerid INT(20) NOT NULL AUTO_INCREMENT,
+    answerid VARCHAR(100) NOT NULL UNIQUE,
     userid INT(20) NOT NULL,
     questionid VARCHAR(100) NOT NULL,
     answer TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     votes INT DEFAULT 0,
     PRIMARY KEY(answerid),
-    FOREIGN KEY(questionid) REFERENCES questions(questionid),
+    FOREIGN KEY(questionid) REFERENCES questions(questionid) ON DELETE CASCADE,
     FOREIGN KEY(userid) REFERENCES user(userid)
 );`;
 
 const voteTable = `CREATE TABLE IF NOT EXISTS votes(
     voteid INT(20) NOT NULL AUTO_INCREMENT,
     userid INT(20) NOT NULL,
-    answerid INT(20) NOT NULL,
+    answerid VARCHAR(100) NOT NULL,
     vote INT NOT NULL,
     PRIMARY KEY(voteid),
     FOREIGN KEY(userid) REFERENCES user(userid),
-    FOREIGN KEY(answerid) REFERENCES answers(answerid)
+    FOREIGN KEY(answerid) REFERENCES answers(answerid) ON DELETE CASCADE
 );`;
 
 module.exports = { userTable, questionTable, answerTable, voteTable };

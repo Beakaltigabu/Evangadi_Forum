@@ -137,6 +137,7 @@ const voteAnswer = async (req, res) => {
       );
     }
 
+
     return res.status(StatusCodes.OK).json({ msg: "Vote recorded successfully" });
   } catch (error) {
     console.error("Error in voteAnswer:", error.message);
@@ -145,4 +146,3 @@ const voteAnswer = async (req, res) => {
 };
 
 module.exports = { getAnswersForQuestion, postAnswer, updateAnswer, deleteAnswer, voteAnswer };
-
