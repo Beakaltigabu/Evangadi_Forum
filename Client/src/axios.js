@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5500/api',
+  baseURL: 'https://evangadi-forum-api-j441.onrender.com/api',
 });
 
 api.interceptors.request.use((config) => {
