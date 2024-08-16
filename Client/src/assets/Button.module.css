@@ -1,0 +1,17 @@
+/* Button.module.css */
+
+/* Style for the button element */
+.button {
+  background-color: orange; /* Set the background color of the button */
+  color: black; /* Set the text color of the button */
+  border: none; /* Remove the default border */
+  padding: 7px 30px; /* Add padding inside the button (top-bottom: 7px, left-right: 30px) */
+  font-size: 16px; /* Set the font size for the button text */
+  border-radius: 5px; /* Round the corners of the button */
+  cursor: pointer; /* Change the cursor to a pointer when hovering over the button */
+}
+
+/* Style for the button element when hovered over */
+.button:hover {
+  background-color: darkorange; /* Change the background color when the button is hovered over */
+}

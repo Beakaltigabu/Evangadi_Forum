@@ -1,0 +1,73 @@
+.home-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .home-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .ask-question-btn {
+    background-color: #516cf0;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+  }
+
+  .welcome-user {
+    font-weight: bold;
+  }
+
+  .search-form {
+    display: flex;
+    margin-bottom: 20px;
+  }
+
+  .search-form input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px 0 0 5px;
+  }
+
+  .search-form button {
+    background-color: #516cf0;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 0 5px 5px 0;
+    cursor: pointer;
+  }
+
+  .questions-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .question-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    text-decoration: none;
+    color: #333;
+  }
+
+  .question-user {
+    font-weight: bold;
+    margin-right: 10px;
+  }
+
+  .question-title {
+    flex-grow: 1;
+  }
+
+  .question-arrow {
+    font-size: 20px;
+  }

@@ -1,0 +1,192 @@
+.homePage {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  height: 110vh;
+}
+
+.homeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.askQuestionBtn {
+  background-color: #516cf0;
+  color: white;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 5px;
+}
+
+.welcomeUser {
+  font-weight: bold;
+}
+
+.welcomeUser span {
+  color: orange;
+  font-weight: bold;
+  padding-inline: 5px;
+}
+
+.searchForm {
+  display: flex;
+  margin-bottom: 20px;
+}
+
+.searchForm input {
+  flex-grow: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px 0 0 5px;
+}
+
+.searchForm input:focus {
+  border: 1px solid orange;
+}
+
+.searchForm button {
+  background-color: #516cf0;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 0 5px 5px 0;
+  cursor: pointer;
+}
+
+.questionsList {
+  display: flex;
+  flex-direction: column;
+}
+
+.questionItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  text-decoration: none;
+  color: #333;
+}
+
+.questionUser {
+  font-weight: bold;
+  margin-right: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.questionTitle {
+  flex-grow: 1;
+}
+
+.questionArrow {
+  font-size: 20px;
+}
+
+.userIcon {
+  color: gray;
+  width: 60px;
+  height: 60px;
+}
+
+.questions__h2 {
+  font-size: 24px;
+  margin-bottom: 5px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #ccc;
+}
+
+.pagination {
+  position: absolute;
+  bottom: -180px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.paginationIcon {
+  font-size: 2rem;
+  color: orange;
+  cursor: pointer;
+  margin: 0 10px;
+}
+
+.paginationIcon.disabled {
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.loadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.preloader {
+  width: 100px;
+  height: 100px;
+}
+
+@media (max-width: 768px) {
+  .homePage {
+    padding: 10px;
+    width: 70%;
+  }
+
+  .homeHeader {
+    flex-wrap: wrap;
+  }
+
+  .askQuestionBtn {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+
+  .welcomeUser {
+    font-size: 14px;
+  }
+
+  .searchForm {
+    flex-wrap: wrap;
+  }
+
+  .searchForm input {
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 5px;
+  }
+
+  .searchForm button {
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 5px;
+  }
+
+  .questionItem {
+    padding: 8px;
+  }
+
+  .questionUser {
+    margin-right: 10px;
+  }
+
+  .questionTitle {
+    font-size: 14px;
+  }
+
+  .questionArrow {
+    font-size: 16px;
+  }
+
+  .pagination {
+    position: static;
+    transform: none;
+    margin-top: 20px;
+  }
+}

@@ -1,0 +1,145 @@
+.signupContainer {
+  max-width: 430px;
+  padding: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+  border-radius: 10px;
+}
+
+.signupContainer h5 {
+  text-align: center;
+  color: #333333;
+  margin-bottom: 20px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.signupContainer p {
+  text-align: center;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.authLink {
+  color: orange;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.formGroup, .formGroupInline {
+  margin-bottom: 10px;
+}
+
+.formRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.formGroupInline {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.formGroupInline:last-child {
+  margin-right: 0;
+}
+
+.formGroup input, .formGroupInline input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+.formGroup input::placeholder, .formGroupInline input::placeholder {
+  color: #999999;
+  font-size: 14px;
+}
+.checkboxContainer input{
+  width: 10%;
+}
+
+.formGroup input:focus, .formGroupInline input:focus {
+  border: none;
+  border-bottom: 3px solid orange;
+  outline: none;
+  transition: border-bottom 0.5s ease-out;
+  transition-property: border-bottom;
+  transition-duration: 0.3s;
+  transition-timing-function: ease-out;
+  transition-delay: 0.1s;
+}
+
+.passwordGroup {
+  position: relative;
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 10px;
+  top: calc(50% - 10px);
+  transform: translateY(-20%);
+  cursor: pointer;
+  color: #666;
+}
+
+.error {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.formGroup p {
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+.agreeJoinBtn {
+  width: 380px;
+  padding: 12px;
+  align-self: center;
+  background-color: #516cf1;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.agreeJoinBtn:hover {
+  background-color: #e98f39;
+}
+
+.signupFooter {
+  text-align: center;
+  margin-top: 5px;
+  color: #555555;
+  font-size: 14px;
+}
+
+.checkboxContainer {
+  display: flex;
+  align-items: center;
+}
+
+.customCheckbox {
+  margin-right: 5px;
+}
+
+.customLabel {
+  font-size: 14px;
+  color: #666;
+}
+.customLabel a{
+  text-decoration: underline;
+}
+.successMessage {
+  color: green;
+  font-weight: bold;
+  margin-top: 10px;
+}

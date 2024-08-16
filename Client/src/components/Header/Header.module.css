@@ -1,0 +1,135 @@
+.header {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 1rem 2rem;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  display: flex;
+  justify-content: center;
+  flex: 1;
+}
+
+.logo img {
+  height: 40px;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.navLinks a {
+  margin: 0 0.75rem;
+  text-decoration: none;
+  color: #333;
+  font-weight: 700;
+  transition: color 0.3s ease;
+}
+
+.navLinks a:last-child {
+  color: #fff;
+}
+
+.navLinks a:last-child:hover {
+  color: #333;
+}
+
+.navLinks a:hover {
+  color: orange;
+}
+
+.authButton {
+  margin-left: 1.5rem;
+  padding: 0.5rem 1.5rem;
+  background-color: #516cf1;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  min-width: 120px;
+  text-align: center;
+}
+
+.authButton:hover {
+  background-color: orange;
+  transform: scale(1.05);
+}
+
+.menuToggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #FFA500;
+}
+
+
+@media (max-width: 768px) {
+  .header {
+    flex-wrap: wrap;
+    padding: 10px;
+    width: 100%;
+  }
+
+  .menuToggle {
+    display: block;
+    order: 2;
+  }
+
+  .navLinks {
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    display: none;
+    order: 3;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 250px;
+    background-color: #ffffff;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    z-index: 1000;
+  }
+
+  .navLinks.open {
+    display: flex;
+    transform: translateX(0);
+  }
+
+  .closeButton {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #FFA500;
+  }
+
+  .navLinks a,
+  .authButton {
+    margin: 0.5rem 0;
+    width: auto;
+  }
+
+  .authButton {
+    min-width: unset;
+    width: auto;
+    color: #ffffff;
+  }
+}
