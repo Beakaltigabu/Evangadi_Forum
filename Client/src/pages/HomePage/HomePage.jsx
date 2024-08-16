@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaUser, FaAngleRight } from 'react-icons/fa';
+import { FaUser, FaAngleRight, FaEdit } from 'react-icons/fa';
 import api from '../../axios';
-import './HomePage.module.css';
+import styles from './HomePage.module.css';
 
 function Home() {
   const [user, setUser] = useState('');
@@ -48,16 +48,16 @@ function Home() {
   };
 
   return (
-    <div className="home-page">
-      <div className="home-header">
-        <Link to="/question" className="ask-question-btn">Ask Question</Link>
+    <div className={styles.homePage}>
+      <div className={styles.homeHeader}>
+        <Link to="/question" className={styles.askQuestionBtn}>Ask Question</Link>
         {user && (
-          <div className="user-info">
-            <p className="welcome-user">Welcome: {user}</p>
+          <div className={styles.userInfo}>
+            <p className={styles.welcomeUser}>Welcome: <span>{user}</span></p>
           </div>
         )}
       </div>
-      <form className="search-form">
+      <form className={styles.searchForm}>
         <input
           type="text"
           placeholder="Search questions..."
@@ -66,16 +66,23 @@ function Home() {
           onKeyPress={handleSearch}
         />
       </form>
-      <div className="questions-list">
+      <div className={styles.questionsList}>
         {questions.map((question) => (
-          <Link to={`/question/${question.questionid}`} key={question.questionid} className="question-item">
-            <span className="question-user">
-              <FaUser className="user-icon" />
+          <div key={question.questionid} className={styles.questionItem}>
+            <span className={styles.questionUser}>
+              <FaUser className={styles.userIcon} />
               {question.username}
             </span>
-            <span className="question-title">{question.title}</span>
-            <FaAngleRight className="question-arrow" />
-          </Link>
+            <Link to={`/question/${question.questionid}`} className={styles.questionTitle}>
+              {question.title}
+            </Link>
+            {user === question.username && (
+              <Link to={`/edit-question/${question.questionid}`} className={styles.editButton}>
+                <FaEdit />
+              </Link>
+            )}
+            <FaAngleRight className={styles.questionArrow} />
+          </div>
         ))}
       </div>
     </div>

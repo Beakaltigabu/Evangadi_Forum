@@ -20,9 +20,6 @@ const postQuestion = async (req, res) => {
       "INSERT INTO questions(questionid, userid, title, description) VALUES (?, ?, ?, ?)",
       [questionid, req.user.userid, title, description]
     );
-    console.log("Authenticated User ID:", req.user.userid);
-
-
 
     return res.status(201).json({ msg: "Question added successfully" });
   } catch (error) {
@@ -74,6 +71,7 @@ const allQuestions = async (req, res) => {
     });
   }
 };
+
 const updateQuestion = async (req, res) => {
   const { question_id } = req.params;
   const { title, description } = req.body;
@@ -84,10 +82,14 @@ const updateQuestion = async (req, res) => {
 
   try {
     const connection = getConnection();
-    await connection.execute(
+    const [result] = await connection.execute(
       "UPDATE questions SET title = ?, description = ? WHERE questionid = ? AND userid = ?",
       [title, description, question_id, req.user.userid]
     );
+
+    if (result.affectedRows === 0) {
+      return res.status(403).json({ error: "You can only edit your own questions" });
+    }
 
     return res.status(200).json({ msg: "Question updated successfully" });
   } catch (error) {
@@ -96,5 +98,25 @@ const updateQuestion = async (req, res) => {
   }
 };
 
-module.exports = { getSingleQuestion, postQuestion, allQuestions, updateQuestion };
+const deleteQuestion = async (req, res) => {
+  const { question_id } = req.params;
 
+  try {
+    const connection = getConnection();
+    const [result] = await connection.execute(
+      "DELETE FROM questions WHERE questionid = ? AND userid = ?",
+      [question_id, req.user.userid]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(403).json({ error: "You can only delete your own questions" });
+    }
+
+    return res.status(200).json({ msg: "Question deleted successfully" });
+  } catch (error) {
+    console.error("Error in deleteQuestion:", error.message);
+    return res.status(500).json({ error: "An error occurred while deleting the question" });
+  }
+};
+
+module.exports = { getSingleQuestion, postQuestion, allQuestions, updateQuestion, deleteQuestion };

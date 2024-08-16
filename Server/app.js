@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require('cors');
 const app = express();
-const port = 3306;
+const port = 5500;
 
 require('dotenv').config();
 
@@ -15,15 +15,12 @@ const dbConnection = getConnection();
 const userRoute = require("./Routes/userRoute");
 const questionRoutes = require("./Routes/questionRoute");
 const answerRoute = require('./Routes/answerRoute');
+const voteRoute = require('./Routes/voteRoute');  
 
 app.use("/api/users", userRoute);
 app.use("/api/questions", questionRoutes);
 app.use('/api/answers', answerRoute);
-
-
-
-
-
+app.use('/api/votes', voteRoute);
 
 async function start() {
   try {

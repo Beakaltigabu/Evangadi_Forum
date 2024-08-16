@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { FaCircleArrowRight } from 'react-icons/fa6';
 import { useNavigate } from 'react-router-dom';
 import api from '../../axios';
-import './Ask.css';
+import classes from './Ask.module.css'; // Updated import to use CSS Modules
 import { AuthContext } from '../../Context/authContext';
 
 function Ask() {
@@ -37,8 +37,8 @@ function Ask() {
   };
 
   return (
-    <div className="question-page">
-      <div className="steps">
+    <div className={classes.questionPage}>
+      <div className={classes.steps}>
         <h2>Steps to Write A Good Question</h2>
         <p><FaCircleArrowRight /> Summarize your problem in a one-line title.</p>
         <p><FaCircleArrowRight /> Describe your problem in more detail.</p>
@@ -52,15 +52,17 @@ function Ask() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Question title"
+          className={classes.input}
         />
         <textarea
           value={detail}
           onChange={(e) => setDetail(e.target.value)}
           placeholder="Question detail..."
+          className={classes.textarea}
         />
-        <button type="submit">Post Question</button>
+        <button type="submit" className={classes.button}>Post Question</button>
       </form>
-      {error && <p className="error">{error}</p>}
+      {error && <p className={classes.error}>{error}</p>}
     </div>
   );
 }
