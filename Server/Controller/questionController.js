@@ -4,21 +4,15 @@ const { v4: uuidv4 } = require("uuid");
 
 const postQuestion = async (req, res) => {
   const { title, description } = req.body;
-
-  if (!title || !description) {
-    return res.status(400).json({ error: "Title and description are required" });
-  }
-
-  if (!req.user || !req.user.userid) {
-    return res.status(401).json({ error: "User not authenticated" });
-  }
+  const userid = req.user.userid;
 
   try {
-    const questionid = uuidv4();
     const connection = getConnection();
+    const questionid = uuidv4();
+
     await connection.execute(
       "INSERT INTO questions(questionid, userid, title, description) VALUES (?, ?, ?, ?)",
-      [questionid, req.user.userid, title, description]
+      [questionid, userid, title, description]
     );
 
     return res.status(201).json({ msg: "Question added successfully" });

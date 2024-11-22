@@ -1,16 +1,21 @@
 import React from 'react';
-import { FaTimes } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
 import './Modal.css';
 
 const Modal = ({ isOpen, onClose, children }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="modal-overlay">
-      <div className="modal-content">
-        <button className="modal-close" onClick={onClose}><FaTimes /></button>
+    <div className="modal-overlay" onClick={onClose}>
+      <motion.div
+        className="modal-content"
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 50 }}
+        onClick={e => e.stopPropagation()}
+      >
         {children}
-      </div>
+      </motion.div>
     </div>
   );
 };

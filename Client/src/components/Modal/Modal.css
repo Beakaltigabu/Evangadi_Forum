@@ -1,31 +1,99 @@
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
 
-  .modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    position: relative;
-    width: 80%;
-    max-width: 500px;
-  }
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
 
-  .modal-close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    color: black;
-    border: none;
-    font-size: 15px;
-    cursor: pointer;
-  }
+.modal-content h2 {
+  color: #2d3748;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e1e4e8;
+}
+
+.modal-content input,
+.modal-content textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 1rem;
+  margin-bottom: 16px;
+  transition: all 0.3s ease;
+}
+
+.modal-content textarea {
+  min-height: 180px;
+  resize: vertical;
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus {
+  border-color: #516cf1;
+  box-shadow: 0 0 0 3px rgba(81, 108, 241, 0.2);
+  outline: none;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #e1e4e8;
+}
+
+.modal-actions button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.modal-actions button:first-child {
+  background: #e2e8f0;
+  color: #4a5568;
+}
+
+.modal-actions button:first-child:hover {
+  background: #cbd5e0;
+}
+
+.modal-actions button:last-child {
+  background: #516cf1;
+  color: white;
+}
+
+.modal-actions button:last-child:hover {
+  background: #4559cc;
+}
+
+.modal-actions button.delete-button {
+  background: #e53e3e;
+}
+
+.modal-actions button.delete-button:hover {
+  background: #c53030;
+}

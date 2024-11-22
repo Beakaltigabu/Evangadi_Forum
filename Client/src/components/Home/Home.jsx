@@ -1,11 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaRegUserCircle, FaAngleRight, FaAngleLeft, FaEdit, FaTrash } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaRegUserCircle, FaSearch, FaSort, FaEdit, FaTrash, FaCheck, FaComment, FaThumbsUp } from 'react-icons/fa';
+import { toast, Toaster } from 'react-hot-toast';
+import { formatDistanceToNow } from 'date-fns';
 import api from '../../axios';
 import classes from './Home.module.css';
 import { AuthContext } from '../../Context/authContext';
-import preloader from '../../assets/preloader.gif';
-import Modal from '../../components/Modal/Modal';
+import Modal from '../Modal/Modal';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 function Home() {
   const { isAuthenticated } = useContext(AuthContext);
@@ -13,69 +16,97 @@ function Home() {
   const [questions, setQuestions] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [sortBy, setSortBy] = useState('newest');
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [updatedTitle, setUpdatedTitle] = useState('');
   const [updatedDescription, setUpdatedDescription] = useState('');
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const questionsPerPage = 5;
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
-      if (isAuthenticated) {
-        try {
-          await fetchUser();
-          await fetchQuestions();
-        } catch (error) {
-          console.error('Error fetching data:', error);
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        navigate('/login');
-      }
-    };
-
-    fetchData();
-  }, [isAuthenticated, navigate]);
-
-  useEffect(() => {
-    if (searchTerm) {
-      fetchQuestions();
+    if (isAuthenticated) {
+      const loadData = async () => {
+        await Promise.all([fetchUser(), fetchQuestions()]);
+      };
+      loadData();
+    } else {
+      navigate('/login');
     }
-  }, [searchTerm]);
+  }, [isAuthenticated]);
 
   const fetchUser = async () => {
     try {
       const response = await api.get('/users/check');
       setUser(response.data.username);
     } catch (error) {
-      console.error('Error fetching user:', error);
-      if (error.response && error.response.status === 401) {
-        navigate('/login');
-      }
+      toast.error('Failed to fetch user data');
+      if (error.response?.status === 401) navigate('/login');
     }
   };
 
   const fetchQuestions = async () => {
     try {
-      console.log('Fetching questions');
+      setLoading(true);
       const response = await api.get('/questions');
-      console.log('Fetched questions:', response.data.questions);
-      setQuestions(response.data.questions);
+      const questionsWithCounts = await Promise.all(
+        response.data.questions.map(async (question) => {
+          const [votesRes, answersRes] = await Promise.all([
+            api.get(`/votes/${question.questionid}`),
+            api.get(`/answers/${question.questionid}`)
+          ]);
+          return {
+            ...question,
+            votes: Object.values(votesRes.data.votes || {}).reduce((sum, vote) => sum + vote, 0),
+            answers_count: answersRes.data.answers?.length || 0,
+            created_at: question.created_at || new Date().toISOString()
+          };
+        })
+      );
+      setQuestions(questionsWithCounts);
     } catch (error) {
-      console.error('Error fetching questions:', error);
-      if (error.response && error.response.status === 401) {
-        navigate('/login');
-      }
+      toast.error('Failed to fetch questions');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSearch = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
+  const handleUpdate = async () => {
+    try {
+      if (!updatedTitle.trim() || !updatedDescription.trim()) {
+        toast.error('Title and description are required');
+        return;
+      }
+
+      await api.put(`/questions/${selectedQuestion.questionid}`, {
+        title: updatedTitle,
+        description: updatedDescription,
+      });
+
+      toast.success('Question updated successfully');
+      fetchQuestions();
+      setEditModalOpen(false);
+    } catch (error) {
+      toast.error('Failed to update question');
+    }
+  };
+
+  const handleDelete = async (questionId) => {
+    try {
+      await api.delete(`/questions/${questionId}`);
+      toast.success('Question deleted successfully');
+      fetchQuestions();
+      setDeleteModalOpen(false);
+    } catch (error) {
+      toast.error('Failed to delete question');
+    }
+  };
+
+  const formatTimeAgo = (date) => {
+    try {
+      return formatDistanceToNow(new Date(date), { addSuffix: true });
+    } catch {
+      return 'recently';
     }
   };
 
@@ -83,159 +114,241 @@ function Home() {
     question.title.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Pagination logic
-  const indexOfLastQuestion = currentPage * questionsPerPage;
-  const indexOfFirstQuestion = indexOfLastQuestion - questionsPerPage;
-  const currentQuestions = filteredQuestions.slice(indexOfFirstQuestion, indexOfLastQuestion);
-
-  const nextPage = () => {
-    if (currentPage < Math.ceil(filteredQuestions.length / questionsPerPage)) {
-      setCurrentPage(currentPage + 1);
-    }
+  const getSortedQuestions = () => {
+    return [...filteredQuestions].sort((a, b) => {
+      switch(sortBy) {
+        case 'votes':
+          return (b.votes || 0) - (a.votes || 0);
+        case 'answers':
+          return (b.answers_count || 0) - (a.answers_count || 0);
+        default:
+          return new Date(b.created_at) - new Date(a.created_at);
+      }
+    });
   };
 
-  const prevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const openModal = (question) => {
-    setSelectedQuestion(question);
-    setUpdatedTitle(question.title);
-    setUpdatedDescription(question.description);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedQuestion(null);
-  };
-
-  const handleUpdate = async () => {
-    if (!selectedQuestion) return;
-
-    try {
-      await api.put(`/questions/${selectedQuestion.questionid}`, {
-        title: updatedTitle,
-        description: updatedDescription,
-      });
-      fetchQuestions();
-      closeModal();
-    } catch (error) {
-      console.error('Error updating question:', error);
-    }
-  };
-
-  const openDeleteModal = (question) => {
-    setSelectedQuestion(question);
-    setIsDeleteModalOpen(true);
-  };
-
-  const closeDeleteModal = () => {
-    setIsDeleteModalOpen(false);
-    setSelectedQuestion(null);
-  };
-
-  const handleDelete = async () => {
-    if (!selectedQuestion) return;
-
-    try {
-      await api.delete(`/questions/${selectedQuestion.questionid}`);
-      fetchQuestions();
-      closeDeleteModal();
-    } catch (error) {
-      console.error('Error deleting question:', error);
-    }
-  };
+  const sortedQuestions = getSortedQuestions();
 
   if (loading) {
-    return (
-      <div className={classes.loadingContainer}>
-        <img src={preloader} alt="Loading..." className={classes.preloader} />
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   return (
-    <div className={classes.homePage}>
-      <div className={classes.homeHeader}>
-        <Link to="/questions" className={classes.askQuestionBtn}>Ask Question</Link>
-        {user && (
-          <div className={classes.userInfo}>
-            <p className={classes.welcomeUser}>Welcome: <span>{user}</span></p>
+    <motion.div
+      className={classes.container}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+    >
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          success: {
+            style: {
+              background: '#4caf50',
+              color: 'white',
+            },
+          },
+          error: {
+            style: {
+              background: '#ef5350',
+              color: 'white',
+            },
+          },
+        }}
+      />
+
+      <div className={classes.header}>
+        <div className={classes.headerLeft}>
+          <div className={classes.userProfile}>
+            <motion.div
+              className={classes.userAvatar}
+              whileHover={{ scale: 1.1 }}
+            >
+              {user[0]?.toUpperCase()}
+            </motion.div>
+            <span className={classes.userName}>{user}</span>
           </div>
-        )}
+        </div>
+
+        <div className={classes.headerRight}>
+          <div className={classes.searchBar}>
+            <FaSearch className={classes.searchIcon} />
+            <input
+              type="text"
+              placeholder="Search questions..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+
+          <div className={classes.actions}>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className={classes.sortSelect}
+            >
+              <option value="newest">Newest</option>
+              <option value="votes">Most Votes</option>
+              <option value="answers">Most Answers</option>
+            </select>
+
+            <Link to="/questions">
+              <motion.button
+                className={classes.askButton}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Ask Question
+              </motion.button>
+            </Link>
+          </div>
+        </div>
       </div>
-      <form className={classes.searchForm}>
+
+      <div className={classes.questionsList}>
+        <AnimatePresence>
+          {sortedQuestions.map((question, index) => (
+            <motion.div
+              key={question.questionid}
+              className={classes.questionItem}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <div className={classes.stats}>
+                <motion.div
+                  className={`${classes.statItem} ${question.votes > 0 ? classes.hasVotes : ''}`}
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <span>{question.votes || 0}</span>
+                  <label>{question.votes === 1 ? 'vote' : 'votes'}</label>
+                </motion.div>
+                <motion.div
+                  className={`${classes.statItem} ${question.answers_count > 0 ? classes.hasAnswers : ''}`}
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <span>{question.answers_count || 0}</span>
+                  <label>{question.answers_count === 1 ? 'answer' : 'answers'}</label>
+                </motion.div>
+              </div>
+
+              <div className={classes.questionContent}>
+                <Link to={`/questions/${question.questionid}`} className={classes.questionTitle}>
+                  {question.title}
+                </Link>
+                <p className={classes.questionExcerpt}>{question.description}</p>
+
+                <div className={classes.questionMeta}>
+                  <div className={classes.tags}>
+                    {question.tags?.split(',').map((tag, i) => (
+                      <span key={i} className={classes.tag}>{tag.trim()}</span>
+                    ))}
+                  </div>
+
+                  <div className={classes.userInfo}>
+                    <span className={classes.askedBy}>
+                      asked {formatTimeAgo(question.created_at)} by{' '}
+                      <span className={classes.username}>{question.username}</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {user === question.username && (
+                <div className={classes.questionActions}>
+                  <motion.button
+                    className={classes.actionButton}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => {
+                      setSelectedQuestion(question);
+                      setUpdatedTitle(question.title);
+                      setUpdatedDescription(question.description);
+                      setEditModalOpen(true);
+                    }}
+                  >
+                    <FaEdit />
+                  </motion.button>
+                  <motion.button
+                    className={`${classes.actionButton} ${classes.deleteButton}`}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => {
+                      setSelectedQuestion(question);
+                      setDeleteModalOpen(true);
+                    }}
+                  >
+                    <FaTrash />
+                  </motion.button>
+                </div>
+              )}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
+      <Modal isOpen={editModalOpen} onClose={() => setEditModalOpen(false)}>
+        <h2>Edit Question</h2>
         <input
           type="text"
-          placeholder="Search questions..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyPress={handleSearch}
+          value={updatedTitle}
+          onChange={(e) => setUpdatedTitle(e.target.value)}
+          className={classes.modalInput}
+          placeholder="Question Title"
         />
-      </form>
-      <div className={classes.questionsList}>
-        <h2 className={classes.questions__h2}>Questions</h2>
-        {currentQuestions.map((question) => (
-          <div key={question.questionid} className={classes.questionItem}>
-            <span className={classes.questionUser}>
-              <FaRegUserCircle className={classes.userIcon} />
-              {question.username}
-            </span>
-            <Link to={`/questions/${question.questionid}`} className={classes.questionTitle}>
-              {question.title}
-            </Link>
-            {user === question.username && (
-              <div className={classes.questionActions}>
-                <button onClick={() => openModal(question)} className={classes.iconButton}>
-                  <FaEdit />
-                </button>
-                <button onClick={() => openDeleteModal(question)} className={classes.iconButton}>
-                  <FaTrash />
-                </button>
-              </div>
-            )}
-            <FaAngleRight className={classes.questionArrow} />
-          </div>
-        ))}
-      </div>
-      <div className={classes.pagination}>
-        <FaAngleLeft onClick={prevPage} className={`${classes.paginationIcon} ${currentPage === 1 ? classes.disabled : ''}`} />
-        <span className={classes.pageNumber}>{currentPage}</span>
-        <FaAngleRight onClick={nextPage} className={`${classes.paginationIcon} ${currentPage === Math.ceil(filteredQuestions.length / questionsPerPage) ? classes.disabled : ''}`} />
-      </div>
-      <Modal isOpen={isModalOpen} onClose={closeModal}>
-        <h2>Edit Question</h2>
-        <form>
-          <input
-            type="text"
-            value={updatedTitle}
-            onChange={(e) => setUpdatedTitle(e.target.value)}
-            placeholder="Question title"
-            className={classes.input}
-          />
-          <textarea
-            value={updatedDescription}
-            onChange={(e) => setUpdatedDescription(e.target.value)}
-            placeholder="Question detail..."
-            className={classes.textarea}
-          />
-          <div className={classes.modalButtons}>
-            <button type="button" onClick={handleUpdate} className={classes.modalButton}>Update</button>
-          </div>
-        </form>
-      </Modal>
-      <Modal isOpen={isDeleteModalOpen} onClose={closeDeleteModal}>
-        <h2>Confirm Delete</h2>
-        <p>Are you sure you want to delete this question?</p>
-        <div className={classes.modalButtons}>
-          <button onClick={closeDeleteModal} className={`${classes.modalButton} ${classes.cancel}`}>Cancel</button>
-          <button onClick={handleDelete} className={`${classes.modalButton} ${classes.confirm}`}>Confirm</button>
+        <textarea
+          value={updatedDescription}
+          onChange={(e) => setUpdatedDescription(e.target.value)}
+          className={classes.modalTextarea}
+          placeholder="Question Description"
+        />
+        <div className={classes.modalActions}>
+          <motion.button
+            onClick={() => setEditModalOpen(false)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={classes.cancelButton}
+          >
+            Cancel
+          </motion.button>
+          <motion.button
+            onClick={handleUpdate}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={classes.updateButton}
+          >
+            Update
+          </motion.button>
         </div>
       </Modal>
-    </div>
+
+      <Modal isOpen={deleteModalOpen} onClose={() => setDeleteModalOpen(false)}>
+        <h2>Delete Question</h2>
+        <p className={classes.modalMessage}>
+          Are you sure you want to delete this question? This action cannot be undone.
+        </p>
+        <div className={classes.modalActions}>
+          <motion.button
+            onClick={() => setDeleteModalOpen(false)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={classes.cancelButton}
+          >
+            Cancel
+          </motion.button>
+          <motion.button
+            onClick={() => handleDelete(selectedQuestion?.questionid)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={classes.deleteButton}
+          >
+            Delete
+          </motion.button>
+        </div>
+      </Modal>
+    </motion.div>
   );
 }
 

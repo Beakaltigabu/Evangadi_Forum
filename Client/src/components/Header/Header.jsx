@@ -1,6 +1,7 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaBars, FaTimes } from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaBars, FaTimes, FaHome, FaInfoCircle, FaSignOutAlt } from 'react-icons/fa';
 import api from '../../axios';
 import classes from './Header.module.css';
 import logo from '../../assets/evangadi-logo.png';
@@ -10,7 +11,6 @@ const Header = ({ toggleAuth }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
   const { isAuthenticated, setIsAuthenticated, logout } = useContext(AuthContext);
-  const menuRef = useRef(null);
 
   useEffect(() => {
     const checkUserStatus = async () => {
@@ -22,7 +22,6 @@ const Header = ({ toggleAuth }) => {
           });
           setIsAuthenticated(true);
         } catch (error) {
-          console.error('User check error:', error);
           setIsAuthenticated(false);
           localStorage.removeItem('token');
         }
@@ -34,21 +33,9 @@ const Header = ({ toggleAuth }) => {
     checkUserStatus();
   }, [setIsAuthenticated]);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setIsMenuOpen(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
   const handleLogout = () => {
     logout();
+    setIsMenuOpen(false);
     navigate('/login');
   };
 
@@ -57,29 +44,78 @@ const Header = ({ toggleAuth }) => {
   };
 
   return (
-    <header className={classes.header}>
-      <div className={classes.logo}>
+    <motion.header
+      className={classes.header}
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{ type: "spring", stiffness: 100 }}
+    >
+      <motion.div className={classes.logo}>
         <Link to="/">
           <img src={logo} alt="Evangadi Forum Logo" />
         </Link>
-      </div>
-      <button className={classes.menuToggle} onClick={toggleMenu}>
-        {isMenuOpen ? <FaTimes /> : <FaBars />}
-      </button>
-      <nav ref={menuRef} className={`${classes.navLinks} ${isMenuOpen ? classes.open : ''}`}>
-        <Link to="/">Home</Link>
-        <Link to="/#">How it Works</Link>
-        {isAuthenticated ? (
-          <button className={classes.authButton} onClick={handleLogout}>
-            LOG OUT
+      </motion.div>
+
+      <FaBars
+        className={`${classes.menuToggle} ${isMenuOpen ? classes.hidden : ''}`}
+        onClick={toggleMenu}
+      />
+
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            className={classes.overlay}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setIsMenuOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      <motion.nav className={`${classes.navLinks} ${isMenuOpen ? classes.open : ''}`}>
+        <div className={classes.sidebarHeader}>
+          <img src={logo} alt="Evangadi Logo" className={classes.sidebarLogo} />
+          <button
+            className={classes.closeButton}
+            onClick={toggleMenu}
+          >
+            <FaTimes />
           </button>
+        </div>
+
+        <div className={classes.navItems}>
+          <Link to="/" onClick={() => setIsMenuOpen(false)}>
+            <FaHome /> Home
+          </Link>
+          <Link to="/how-it-works" onClick={() => setIsMenuOpen(false)}>
+            <FaInfoCircle /> How it Works
+          </Link>
+        </div>
+
+        {isAuthenticated ? (
+          <motion.button
+            className={`${classes.authButton} ${classes.logoutButton}`}
+            onClick={handleLogout}
+            whileHover={{ scale: 1.05, backgroundColor: '#e98f39' }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <FaSignOutAlt /> LOG OUT
+          </motion.button>
         ) : (
-          <Link to="/" onClick={() => toggleAuth(true)} className={`${classes.authButton} ${classes.authLink}`}>
+          <Link
+            to="/"
+            className={classes.authButton}
+            onClick={() => {
+              setIsMenuOpen(false);
+              toggleAuth && toggleAuth(true);
+            }}
+          >
             SIGN IN
           </Link>
         )}
-      </nav>
-    </header>
+      </motion.nav>
+    </motion.header>
   );
 };
 

@@ -5,7 +5,6 @@ const authMiddleware = async (req, res, next) => {
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer')) {
-     // console.log('No token provided or invalid token format');
       return res.status(401).json({ msg: 'Authentication invalid' });
     }
 
@@ -16,7 +15,6 @@ const authMiddleware = async (req, res, next) => {
       req.user = { userid: decoded.userid, username: decoded.username };
       next();
     } catch (error) {
-      console.log('Token verification failed:', error.message);
       return res.status(401).json({ msg: 'Authentication invalid' });
     }
 };

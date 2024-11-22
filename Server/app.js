@@ -10,12 +10,10 @@ const { getConnection, createTables } = require("./db/dbConfig");
 app.use(cors());
 app.use(express.json());
 
-const dbConnection = getConnection();
-
 const userRoute = require("./Routes/userRoute");
 const questionRoutes = require("./Routes/questionRoute");
 const answerRoute = require('./Routes/answerRoute');
-const voteRoute = require('./Routes/voteRoute');  
+const voteRoute = require('./Routes/voteRoute');
 
 app.use("/api/users", userRoute);
 app.use("/api/questions", questionRoutes);
@@ -24,6 +22,7 @@ app.use('/api/votes', voteRoute);
 
 async function start() {
   try {
+    const dbConnection = getConnection();
     await dbConnection.execute("SELECT 1");
     await createTables();
     app.listen(port, () => {

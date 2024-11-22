@@ -1,74 +1,160 @@
 .questionPage {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
-  background-color: #fafafa;
-}
-
-h1 {
-  text-align: center;
-  margin-bottom: 20px;
+  padding: 2rem;
+  background: #f8f9fa;
+  min-height: calc(100vh - 100px);
 }
 
 .steps {
-  margin-bottom: 20px;
-  position: relative;
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .steps h2 {
-  display: inline-block;
-  margin-bottom: 10px;
-  position: relative;
+  color: #2d3748;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e2e8f0;
 }
 
-.steps h2::after {
-  content: '';
-  display: block;
-  width: 50%;
-  border-bottom: 2px solid orange;
-  position: absolute;
-  bottom: -5px;
-  left: 0;
-}
-
-.steps p {
+.stepItem {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
-  margin-left: 20px;
+  gap: 12px;
+  padding: 12px 0;
+  color: #4a5568;
+  transition: transform 0.3s ease;
 }
 
-.steps svg {
-  margin-right: 10px;
+.stepItem:hover {
+  transform: translateX(5px);
 }
 
-form {
-  display: flex;
-  flex-direction: column;
+.stepIcon {
+  color: #516cf1;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.formSection {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.formSection h1 {
+  color: #2d3748;
+  font-size: 1.8rem;
+  margin-bottom: 24px;
+}
+
+.inputGroup {
+  position: relative;
+  margin-bottom: 24px;
 }
 
 .input, .textarea {
-  margin-bottom: 10px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  background: #fff;
+}
+
+.input:focus, .textarea:focus {
+  border-color: #516cf1;
+  box-shadow: 0 0 0 3px rgba(81, 108, 241, 0.1);
+  outline: none;
 }
 
 .textarea {
-  height: 150px;
+  min-height: 200px;
+  resize: vertical;
+  font-family: inherit;
 }
 
-.button {
-  padding: 10px;
-  background-color: #516cf0;
+.charCount {
+  position: absolute;
+  right: 12px;
+  bottom: -20px;
+  font-size: 0.8rem;
+  color: #718096;
+}
+
+.textareaHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+.markdownIcon {
+  color: #516cf1;
+}
+
+.submitButton {
+  background: #516cf1;
   color: white;
+  padding: 12px 24px;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
   cursor: pointer;
-  width: 110px;
+  transition: all 0.3s ease;
+  width: 100%;
+  margin-top: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
 }
 
-.error {
-  color: red;
-  margin-top: 10px;
+.submitButton:hover:not(:disabled) {
+  background: #4559cc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(81, 108, 241, 0.2);
+}
+
+.submitButton:disabled {
+  background: #a0aec0;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .questionPage {
+    padding: 1rem;
+  }
+
+  .steps, .formSection {
+    padding: 16px;
+  }
+
+  .steps h2 {
+    font-size: 1.2rem;
+  }
+
+  .formSection h1 {
+    font-size: 1.5rem;
+  }
+
+  .input, .textarea {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+
+  .submitButton {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
 }

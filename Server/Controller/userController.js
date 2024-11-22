@@ -4,36 +4,54 @@ const { getConnection } = require("../db/dbConfig");
 
 const register = async (req, res) => {
   const { username, firstName, lastName, email, password } = req.body;
+  console.log('Registration attempt:', { username, firstName, lastName, email });
 
   if (!email || !password || !username || !firstName || !lastName) {
-    return res.status(400).json({ message: "Please Provide all required Fields!" });
+    return res.status(400).json({
+      status: 'error',
+      message: "All fields are required"
+    });
   }
 
   try {
     const connection = getConnection();
-    const [user] = await connection.execute(
-      "SELECT username, userid FROM user WHERE username = ? OR email = ?",
+    const [existingUser] = await connection.execute(
+      "SELECT username, userid, email FROM user WHERE username = ? OR email = ?",
       [username, email]
     );
 
-    if (user.length > 0) {
-      return res.status(400).json({ message: "This User Already Exists" });
+    if (existingUser.length > 0) {
+      const field = existingUser[0].username === username ? 'username' : 'email';
+      return res.status(400).json({
+        status: 'error',
+        field: field,
+        message: `This ${field} is already registered`
+      });
     }
 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    await connection.query(
+    const [result] = await connection.execute(
       "INSERT INTO user (username, firstname, lastname, email, password) VALUES (?, ?, ?, ?, ?)",
       [username, firstName, lastName, email, hashedPassword]
-    );
+  );
 
-    return res.status(201).json({ message: "User registered successfully" });
+    return res.status(201).json({
+      status: 'success',
+      message: "Registration successful! Please log in.",
+      userid: result.insertId
+    });
   } catch (err) {
-    console.log(err.message);
-    return res.status(500).json({ message: "Something went wrong, try again Later" });
+    console.log('Registration error:', err);
+    return res.status(500).json({
+      status: 'error',
+      message: "Registration failed. Please try again."
+    });
   }
 };
+
+
 
 const login = async (req, res) => {
   const { email, password } = req.body;
@@ -50,19 +68,18 @@ const login = async (req, res) => {
     );
 
     if (user.length === 0) {
-      return res.status(400).json({ message: "There is no User with this email" });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
     const isMatch = await bcrypt.compare(password, user[0].password);
     if (!isMatch) {
-      return res.status(400).json({ message: "The Password is Not Correct!" });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
     const token = jwt.sign(
       {
         userid: user[0].userid,
         username: user[0].username,
-        email: user[0].email,
       },
       process.env.JWT_SECRET,
       { expiresIn: "30d" }
@@ -79,7 +96,6 @@ const login = async (req, res) => {
     return res.status(500).json({ message: "Something went wrong, try again Later" });
   }
 };
-
 
 const checkUsers = async (req, res) => {
   const username = req.user.username;

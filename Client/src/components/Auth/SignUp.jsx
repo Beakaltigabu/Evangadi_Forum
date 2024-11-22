@@ -1,12 +1,11 @@
-import React, { useState, useContext } from "react";
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEye, faEyeSlash, faUser, faEnvelope, faLock } from "@fortawesome/free-solid-svg-icons";
 import api from '../../axios';
 import classes from './SignUp.module.css';
-import { AuthContext } from '../../Context/authContext';
 
 const SignUp = ({ toggleAuth }) => {
-  const { setIsAuthenticated } = useContext(AuthContext);
   const [formData, setFormData] = useState({
     username: "",
     firstName: "",
@@ -19,17 +18,21 @@ const SignUp = ({ toggleAuth }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
-
-  const handleCheckboxChange = (e) => {
-    setIsChecked(e.target.checked);
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
   };
 
   const validateForm = () => {
@@ -39,7 +42,7 @@ const SignUp = ({ toggleAuth }) => {
     if (!formData.lastName) newErrors.lastName = "Last name is required";
     if (!formData.email) newErrors.email = "Email is required";
     if (!formData.password) newErrors.password = "Password is required";
-    if (!isChecked) newErrors.checkbox = "You must agree to the privacy policy and terms of service";
+    if (!isChecked) newErrors.checkbox = "You must agree to the terms";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -47,39 +50,61 @@ const SignUp = ({ toggleAuth }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (validateForm()) {
+      setIsLoading(true);
       try {
         const response = await api.post("/users/register", formData);
         if (response.status === 201) {
-          setSuccessMessage("Registration successful! Please log in.");
+          setSuccessMessage("Registration successful!");
           setTimeout(() => {
-            toggleAuth(true); // Toggle to login component
-          }, 2000); // Show success message for 2 seconds
+            toggleAuth(true);
+          }, 2000);
         }
       } catch (error) {
-        console.error("Error:", error.response?.data?.message || error.message);
+        setErrors({ submit: error.response?.data?.message || "Registration failed" });
+      } finally {
+        setIsLoading(false);
       }
     }
   };
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
   return (
-    <div className={classes.signupContainer}>
-      <h5>Join the Network</h5>
+    <motion.div
+      className={classes.signupContainer}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+    >
+      <h3>Join the Network</h3>
       <p>
         Already have an account?{" "}
-        <span onClick={() => toggleAuth(true)} className={classes.authLink}>
+        <motion.span
+          onClick={() => toggleAuth(true)}
+          className={classes.authLink}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
           Sign in
-        </span>
+        </motion.span>
       </p>
-      {successMessage && <div className={classes.successMessage}>{successMessage}</div>}
+
+      <AnimatePresence>
+        {successMessage && (
+          <motion.div
+            className={classes.successMessage}
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+          >
+            {successMessage}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <form onSubmit={handleSubmit}>
-        <div className={classes.formGroup}>
+        <div className={classes.inputGroup}>
+          <FontAwesomeIcon icon={faUser} className={classes.inputIcon} />
           <input
             type="text"
-            id="username"
             name="username"
             placeholder="Username"
             value={formData.username}
@@ -87,38 +112,37 @@ const SignUp = ({ toggleAuth }) => {
           />
           {errors.username && <span className={classes.error}>{errors.username}</span>}
         </div>
+
         <div className={classes.formRow}>
-          <div className={classes.formGroupInline}>
+          <div className={classes.inputGroup}>
+            <FontAwesomeIcon icon={faUser} className={classes.inputIcon} />
             <input
               type="text"
-              id="firstName"
               name="firstName"
               placeholder="First Name"
               value={formData.firstName}
               onChange={handleChange}
             />
-            {errors.firstName && (
-              <span className={classes.error}>{errors.firstName}</span>
-            )}
+            {errors.firstName && <span className={classes.error}>{errors.firstName}</span>}
           </div>
-          <div className={classes.formGroupInline}>
+
+          <div className={classes.inputGroup}>
+            <FontAwesomeIcon icon={faUser} className={classes.inputIcon} />
             <input
               type="text"
-              id="lastName"
               name="lastName"
               placeholder="Last Name"
               value={formData.lastName}
               onChange={handleChange}
             />
-            {errors.lastName && (
-              <span className={classes.error}>{errors.lastName}</span>
-            )}
+            {errors.lastName && <span className={classes.error}>{errors.lastName}</span>}
           </div>
         </div>
-        <div className={classes.formGroup}>
+
+        <div className={classes.inputGroup}>
+          <FontAwesomeIcon icon={faEnvelope} className={classes.inputIcon} />
           <input
             type="email"
-            id="email"
             name="email"
             placeholder="Email address"
             value={formData.email}
@@ -126,45 +150,58 @@ const SignUp = ({ toggleAuth }) => {
           />
           {errors.email && <span className={classes.error}>{errors.email}</span>}
         </div>
-        <div className={`${classes.formGroup} ${classes.passwordGroup}`}>
+
+        <div className={classes.inputGroup}>
+          <FontAwesomeIcon icon={faLock} className={classes.inputIcon} />
           <input
             type={showPassword ? "text" : "password"}
-            id="password"
             name="password"
             placeholder="Password"
             value={formData.password}
             onChange={handleChange}
           />
-          <span className={classes.passwordToggle} onClick={togglePasswordVisibility}>
+          <motion.span
+            className={classes.passwordToggle}
+            onClick={() => setShowPassword(!showPassword)}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
             <FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
-          </span>
+          </motion.span>
           {errors.password && <span className={classes.error}>{errors.password}</span>}
         </div>
-        <div className={`${classes.formGroup} ${classes.checkboxContainer}`}>
+
+        <div className={classes.checkboxContainer}>
           <input
             type="checkbox"
-            id="privacyPolicy"
-            name="privacyPolicy"
+            id="terms"
             checked={isChecked}
-            onChange={handleCheckboxChange}
-            className={classes.customCheckbox}
+            onChange={(e) => setIsChecked(e.target.checked)}
           />
-          <label htmlFor="privacyPolicy" className={classes.customLabel}>
-            I agree to the <a href="/#" className={classes.authLink}>privacy policy</a> and{" "}
-            <a href="/#" className={classes.authLink}>terms of service</a>.
+          <label htmlFor="terms">
+            I agree to the <a href="/#">privacy policy</a> and <a href="/#">terms of service</a>
           </label>
           {errors.checkbox && <span className={classes.error}>{errors.checkbox}</span>}
         </div>
-        <button type="submit" className={classes.agreeJoinBtn}>Agree and Join</button>
+
+        <motion.button
+          type="submit"
+          disabled={isLoading}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          {isLoading ? (
+            <motion.div
+              className={classes.spinner}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            />
+          ) : (
+            "Agree and Join"
+          )}
+        </motion.button>
       </form>
-      <div className={classes.signupFooter}>
-        <p>
-          <span onClick={() => toggleAuth(true)} className={classes.authLink}>
-            Already have an account?
-          </span>
-        </p>
-      </div>
-    </div>
+    </motion.div>
   );
 };
 

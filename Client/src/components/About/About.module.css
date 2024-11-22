@@ -1,25 +1,103 @@
-.login__about {
-  width: 450px;
-  height: 400px;
+.aboutContainer {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  padding: 35px;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  width: 100%;
 }
 
-.about {
-  color: #da7000;
+.login {
+  height: 410px; /* Reduced from 480px to match Login component */
+}
+
+.signup {
+  height: 490px; /* Reduced from 680px to match SignUp component */
+}
+
+
+.content {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.badge {
+  display: inline-block;
+  color: #e98f39;
   font-size: 18px;
+  font-weight: 500;
+  position: relative;
+  padding-bottom: 5px;
 }
 
-.about__title,
-.about__Discription {
-  color: rgb(53, 51, 51);
+.badge::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 30px;
+  height: 2px;
+  background: #e98f39;
 }
 
-.how_it_works {
-  background-color: #fe8402;
-  padding: 5px 15px;
-  font-size: 12px;
-  border: none;
-  border-radius: 3px;
+.title {
+  color: #516cf1;
+  font-size: 28px;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.description {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+.description p {
+  color: #666;
+  line-height: 1.6;
+  margin: 0;
+  font-size: 15px;
+}
+
+.howItWorks {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #516cf1;
   color: white;
-  width: 150px;
-  height: 35px;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  width: fit-content;
+  transition: all 0.3s ease;
+  margin-top: auto;
+}
+
+.arrowIcon {
+  transition: transform 0.3s ease;
+}
+
+.howItWorks:hover .arrowIcon {
+  transform: translateX(5px);
+}
+
+@media (max-width: 768px) {
+  .aboutContainer {
+    padding: 25px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .description p {
+    font-size: 14px;
+  }
 }

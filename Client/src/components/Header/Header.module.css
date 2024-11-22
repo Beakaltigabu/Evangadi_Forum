@@ -1,135 +1,217 @@
 .header {
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
-  padding: 1rem 2rem;
+  padding: 1rem 4rem;
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
 .logo {
   display: flex;
-  justify-content: center;
-  flex: 1;
+  align-items: center;
 }
 
 .logo img {
   height: 40px;
+  filter: brightness(1);
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.logo:hover img {
+  filter: brightness(1.1);
 }
 
 .navLinks {
   display: flex;
   align-items: center;
-  justify-content: center;
-  flex: 1;
+  gap: 3rem;
+  margin-left: auto;
 }
 
 .navLinks a {
-  margin: 0 0.75rem;
   text-decoration: none;
   color: #333;
   font-weight: 700;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
+  position: relative;
+  padding: 5px 0;
 }
 
-.navLinks a:last-child {
-  color: #fff;
+.navLinks a::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: #e98f39;
+  transition: width 0.3s ease;
 }
 
-.navLinks a:last-child:hover {
-  color: #333;
-}
-
-.navLinks a:hover {
-  color: orange;
+.navLinks a:hover::after {
+  width: 100%;
 }
 
 .authButton {
-  margin-left: 1.5rem;
-  padding: 0.5rem 1.5rem;
+  padding: 0.8rem 2.5rem;
   background-color: #516cf1;
-  color: #ffffff;
+  color: #ffffff !important;
   border: none;
-  border-radius: 4px;
-  font-weight: bold;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
   text-decoration: none;
-  transition: background-color 0.3s ease, transform 0.2s ease;
-  min-width: 120px;
+  min-width: 180px;
   text-align: center;
+  transition: all 0.3s ease;
 }
 
 .authButton:hover {
-  background-color: orange;
-  transform: scale(1.05);
+  background: #e98f39;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(233, 143, 57, 0.2);
+}
+
+.logoutButton {
+  min-width: 100px !important;
+  padding: 0.8rem 1.2rem !important;
+  width: auto !important;
 }
 
 .menuToggle {
   display: none;
-  background: none;
-  border: none;
-  font-size: 1.5rem;
-  cursor: pointer;
-  color: #FFA500;
 }
 
+.menuToggle.hidden {
+  display: none;
+}
 
-@media (max-width: 768px) {
+.overlay {
+  display: none;
+}
+
+.sidebarHeader {
+  display: none;
+}
+
+@media (max-width: 1023px) {
   .header {
-    flex-wrap: wrap;
-    padding: 10px;
-    width: 100%;
+    padding: 1rem 2rem;
+  }
+
+  .navLinks {
+    gap: 2rem;
+  }
+
+  .authButton {
+    min-width: 150px;
+  }
+}
+
+@media (max-width: 767px) {
+  .header {
+    padding: 1rem;
   }
 
   .menuToggle {
     display: block;
-    order: 2;
+    font-size: 1.5rem;
+    color: #516cf1;
+    cursor: pointer;
+    z-index: 1001;
   }
 
-  .navLinks {
-    flex-basis: 100%;
-    flex-direction: column;
-    align-items: flex-start;
-    display: none;
-    order: 3;
+  .overlay {
+    display: block;
     position: fixed;
     top: 0;
     left: 0;
-    height: 100%;
-    width: 250px;
-    background-color: #ffffff;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+  }
+
+  .navLinks {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    height: 100vh;
+    width: 300px;
+    background: white;
+    flex-direction: column;
     padding: 2rem;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease-in-out;
-    z-index: 1000;
+    transition: 0.3s ease-in-out;
+    z-index: 999;
+    gap: 2rem;
   }
 
   .navLinks.open {
+    right: 0;
+  }
+
+  .sidebarHeader {
     display: flex;
-    transform: translateX(0);
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 1.5rem;
+  }
+
+  .sidebarLogo {
+    height: 30px;
   }
 
   .closeButton {
-    position: absolute;
-    top: 10px;
-    right: 10px;
+    font-size: 24px;
+    color: #516cf1;
+    cursor: pointer;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease;
     background: none;
     border: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: #FFA500;
   }
 
-  .navLinks a,
-  .authButton {
-    margin: 0.5rem 0;
-    width: auto;
+  .closeButton:hover {
+    color: #e98f39;
+  }
+
+  .navItems {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .navItems a {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    padding: 0.5rem;
   }
 
   .authButton {
-    min-width: unset;
-    width: auto;
-    color: #ffffff;
+    width: 100%;
+    margin: 0;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 479px) {
+  .navLinks {
+    width: 250px;
+  }
+
+  .logo img {
+    height: 35px;
   }
 }
