@@ -23,31 +23,31 @@ const postQuestion = async (req, res) => {
 };
 
 const getSingleQuestion = async (req, res) => {
-  const { question_id } = req.params;
-
+  let conn;
   try {
-    const connection = getConnection();
-    const [question] = await connection.execute(
+    conn = await getConnection();
+    const [question] = await conn.execute(
       "SELECT * FROM questions WHERE questionid = ?",
-      [question_id]
+      [req.params.question_id]
     );
 
     if (question.length === 0) {
-      return res.status(StatusCodes.NOT_FOUND).json({
+      return res.status(404).json({
         error: "Not Found",
-        message: "The requested question could not be found."
+        message: "Question not found"
       });
     }
 
-    res.status(StatusCodes.OK).json({ question: question[0] });
+    res.status(200).json({ question: question[0] });
   } catch (error) {
     console.error('Error in getSingleQuestion:', error);
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+    res.status(500).json({
       error: "Internal Server Error",
       message: error.message
     });
   }
 };
+
 
 const allQuestions = async (req, res) => {
   try {

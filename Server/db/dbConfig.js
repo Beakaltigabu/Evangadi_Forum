@@ -2,7 +2,6 @@ const mysql = require('mysql2/promise');
 const { userTable, questionTable, answerTable, voteTable } = require('../Models/mySqlTable');
 
 let connection;
-
 const getConnection = () => {
   if (!connection) {
     connection = mysql.createPool({
@@ -11,12 +10,15 @@ const getConnection = () => {
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
       waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0
+      connectionLimit: 3, 
+      queueLimit: 0,
+      enableKeepAlive: true,
+      keepAliveInitialDelay: 0
     });
   }
   return connection;
 };
+
 
 const createTables = async () => {
   const conn = getConnection();
