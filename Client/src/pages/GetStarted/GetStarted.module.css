@@ -132,7 +132,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    width: 200px; 
+    width: 200px;
     margin: 0 auto;
   }
 
@@ -271,3 +271,88 @@
     font-size: 0.95rem;
     margin-top: 10px;
   }
+
+
+@media (min-width: 1024px) {
+  .container {
+    padding: 60px 40px;
+    gap: 80px;
+  }
+
+  .hero h1 {
+    font-size: 3.5rem;
+  }
+
+  .features, .steps {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+
+  .featureCard, .step {
+    padding: 30px;
+  }
+}
+
+
+@media (max-width: 1023px) {
+  .container {
+    padding: 40px 20px;
+    gap: 60px;
+  }
+
+  .hero h1 {
+    font-size: 2.8rem;
+  }
+
+  .features, .steps {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+  }
+
+  .featureCard, .step {
+    padding: 25px;
+  }
+
+  .getStartedButton {
+    width: 180px;
+    padding: 12px 24px;
+  }
+}
+
+@media (max-width: 767px) {
+  .container {
+    padding: 30px 15px;
+    gap: 40px;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+  }
+
+  .hero p {
+    font-size: 1rem;
+    padding: 0 15px;
+  }
+
+  .features, .steps {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .featureCard, .step {
+    padding: 20px;
+  }
+
+  .getStartedButton {
+    width: 160px;
+    padding: 10px 20px;
+  }
+
+  .icon {
+    font-size: 2rem;
+  }
+
+  .featureCard h3 {
+    font-size: 1.2rem;
+  }
+}
